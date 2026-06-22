@@ -1,1 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel de Recomposição — Língua Inglesa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .fade-in { animation: fade .25s ease; }
+  @keyframes fade { from { opacity:0; transform: translateY(4px);} to { opacity:1; transform:none;} }
+  input:focus, select:focus, textarea:focus { outline: none; }
+  #boot { min-height:100vh; display:flex; align-items:center; justify-content:center; color:#94a3b8; }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+<div id="root"><div id="boot">Carregando o painel…</div></div>
+<script>
+(() => {
+  const { useState, useEffect, useRef } = React;
+  const e = React.createElement;
 
+  const SUPABASE_URL = "https://bihnhjrdapzljmnqvmbu.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_1yNJ3Phopn5jFRESs8roHQ_1tvdoTg_";
+  let supabase = null;
+  try { if (window.supabase && window.supabase.createClient) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e){}
+
+  const SEED_VERSAO = 3;
+  const METAS = { "6":{ouro:5.0,diamante:5.4}, "7":{ouro:7.0,diamante:7.3}, "8":{ouro:6.3,diamante:6.7}, "9":{ouro:7.2,diamante:7.5} };
+  const serieDe = (t)=> t.charAt(0);
+
+  const BASE = {
+   "6ºA":{pp:null,a:[["Ana Carolina Camargo Diniz",10,0,null],["Ana Clara Oliveira Caetano da Silva",10,0,null],["Bianca Domingos do Prado",10,2,null],["Brunno Henrique da Silva Lopez",10,0,null],["Davi Lucas Carvalho",10,2,null],["Diego Damazio Palermo",10,0,null],["Eliza de Jesus Lima",8,0,null],["Ester Jesus Torres",8,2,null],["Evelyn Vitoria Xavier Gregorio",7,2,null],["Gabriel Freires de Almeida",1,2,null],["Gabriel Luiz Severini Cruz",10,2,null],["Guilherme Kuroishi Nomura",10,0,null],["Heitor de Oliveira Borges",10,0,null],["Isabella Ferreira da Silva",10,0,null],["Isaque Daniel Alves Moraes",6,4,null],["Julio Cesar Naves",10,0,null],["Kaique Krause Custodio",10,2,null],["Kauane Siqueira do Nascimento",10,4,null],["Kimberlly Pereira Silva",7,2,null],["Manuela Mendes dos Santos",10,0,null],["Marcelle Bocchi Labbê",10,0,null],["Mariana Oliveira Silva de Sa",8,0,null],["Miguel Douglas Severini Cruz",9,0,null],["Rafael Andrade Cardoso",7,0,null],["Samuel Borges Emiliano",10,0,null],["Sophia Almeida da Silva",10,4,null],["Valenthina Feitoza da Silva Pedro",10,0,null],["Valentina Araujo Lima Ferreira",8,4,null],["Anna Clara Prates Gamarra",10,0,null],["Milena de Souza Carvalho",null,null,null],["Alice Souza Santos",null,null,null]]},
+   "6ºB":{pp:54.7,a:[["Alexandre Alves Machado",9,9,8],["Aline Alves Machado",8,0,8],["Amanda Izidro",8,6,null],["Arthur Carvalho Faria",10,0,10],["Bernardo Augusto Camargo Reigota",5,0,null],["Bianca Sofia Souza da Silva",3,12,null],["Bryan da Mata Andrade Almeida",7,2,null],["Davi de Paula Santos",10,4,10],["Davi Luiz Jesus da Silva",10,2,null],["Diogo Lopes dos Santos",8,2,null],["Henry Gabriel Silva Toledo",8,2,8],["Hiago Codina Santos Silva",1,0,null],["Isabela de Souza Silva",10,0,10],["Lara Yasmin Boaventura do Vale Kawata",10,2,10],["Leticia Rosario Ribeiro",10,0,10],["Liz Yudith Benito Chura",4,6,null],["Luana Silva Ribeiro",8,0,8],["Maria Eduarda Martins Chaves",0,16,null],["Maria Gabriela de Carvalho Silva",10,6,10],["Maria Livia Nascimento Magalhaes",10,0,10],["Matheus Fernandes de Souza",10,2,10],["Miguel de Jesus Borges",10,0,null],["Pyetro Kaue Rodrigues Coimbra Silva",10,0,10],["Robert Lucas Martins Ferreira",2,6,null],["Sofia Gabrielly Ono",4,2,null],["Sophia Barros Maciel",8,2,null],["Sophia Torres",8,6,10],["Thalita Ramos Donato de Freitas",8,0,8],["Valentina Teixeira Machado",4,0,null],["Allan Cristopher Santana da Silva",null,null,null],["Danieli Valentina Ribeiro Ferreira",null,null,null]]},
+   "6ºC":{pp:55.3,a:[["Alexandre Hiago Bonifacio Brazilino",8,4,null],["Alice Araujo Doria",10,0,10],["Alice Hadassa Oliveira Rios",10,4,10],["Alyah Gabrielly Santos Bedutti",10,0,10],["Ana Clara Moraes Silva",10,2,10],["Barbara Vitoria Goncalves Damasceno",10,4,10],["Bruno Henrique Sena Santos",8,2,8],["Davi de Carvalho Ferreira Silva",10,5,10],["Eduardo Garcia Magalhaes",4,0,null],["Esther Oliveira Cruz",10,0,10],["Heitor Pires de Almeida Rocha",10,4,8],["Igor Rafael Diniz Nunes",4,0,null],["Juliana Rodrigues Barbosa",8,6,8],["Larissa Manuelly Oliveira Tonolli",6,6,6],["Lavinia Gabrielly Brandao de Aquino",6,2,null],["Lorenzo Ancelani Galiasi",6,3,10],["Lorenzo dos Santos Marschiello Dantas",10,9,10],["Lorenzo Porfirio da Silva Guimaraes",3,2,null],["Manuela Boaventura Bedendo",10,2,10],["Maria Ludimylla Lisboa de Sousa",8,0,null],["Miguel Lucas Chialastre Ianicelli",10,2,10],["Miguel Nascimento Maia",10,4,10],["Nicolly Cansancao Nezzi",8,4,null],["Pietro Oliveira da Silva",4,4,null],["Rafael Rocha Brito",10,2,10],["Rebeca Uchôa Sousa de Alencar",10,2,10],["Thiffany Lorellaine Ferreira Santos",10,2,10],["Valentina Alves Zucchini",8,0,8],["Ana Julia Araujo Fraron",null,0,null],["Jamile Vieira Camelo",null,null,null],["Pedro Rafles Sousa",null,null,null]]},
+   "7ºA":{pp:57.8,a:[["Arthur Borazo dos Santos",9,0,null],["Ayla Oliveira Macedo",10,0,10],["Bianka Gabrielly de Oliveira Tonolli",8,6,8],["Bruno dos Santos Ferreira",10,0,10],["Ellen Ranielly da Silva Oliveira",10,0,null],["Emanuelly da Silva Rodrigues",4,0,null],["Emilly Soares do Nascimento",10,3,null],["Emily Nubiato de Oliveira",10,0,10],["Gabriel Henrique Carvalho de Jesus",6,8,null],["Helena Vitoria Mota Coutinho",8,4,null],["Isabelly Tereza Quirino de Souza",8,0,null],["Isadora Oliveira do Nascimento",10,8,null],["Isaque Castilho Lira",6,0,null],["Isaque Leite Ferreira",8,6,8],["Joana Ferreira de Souza",8,6,null],["Joao Lucas Colin de Alcantara Castilho",10,2,8],["Kauan Vinicius Santos Guerino",6,0,null],["Laura Sayuri Custodio Ueda",8,8,8],["Luan Otavio da Silva Moreno",2,2,null],["Lucas Jovanini Erostati",10,0,null],["Lucas Santos Costa",10,2,10],["Luiza Gabrielly de Oliveira Silva",10,6,null],["Mariana Dias de Almeida",10,2,10],["Marianna Duarte Vega",10,4,8],["Miguel Manoel Alves Araujo",6,2,null],["Milena Borges da Silva",10,0,10],["Murillo Isaac Marcelino Barbosa",10,0,10],["Renato Joaquim Cavalcante Gomes",4,4,null],["Richard Mascarenhas Pompeu",5,12,null],["Ruann Gustavo Rocha Ribeiro",6,0,null],["Yasmim Cabral Prado",8,0,8],["Anna Carolina dos Santos Goncalves da Silva",10,0,null],["Christian de Almeida Silva",10,2,8],["Murillo Silva Arruda",null,0,null]]},
+   "7ºB":{pp:49.0,a:[["Alice Victoria Passos Duarte",8,2,null],["Ana Luiza Naves Celestino",4,2,null],["Anabela Santos Garcia",7,2,null],["Arthur Gabriel Godoy Gomes da Rosa",8,0,8],["Arthur Rodrigues Santos Moura",6,0,null],["Beatriz dos Santos Amorim",6,0,null],["Breno Augusto de Meireles",2,6,null],["Camilly Benjamin Sena dos Santos",6,6,null],["Caua Miguel Bernardini Bacurau Boaro",10,4,10],["Cesar Henrique Costa Soares Filho",8,0,8],["Davi Albuquerque Araujo Fonseca",8,0,8],["Eluany Mendes Lopes",2,0,null],["Erick Pietro Rodrigues Daltro",10,4,10],["Giovanna de Souza Oliveira",8,4,null],["Giullia Beatryz Alves dos Santos",4,0,null],["Gloria Sibelly Nascimento",6,0,null],["Héctor Sena Nunes Lima",1,2,null],["Heloisa Mohamed de Almeida",10,0,10],["Isabelle Barros Paulino",1,6,null],["Jorge Paulo Nascimento Cervino",8,0,8],["Kamilly Pereira dos Santos",4,4,null],["Kaua Cardia Fernandes",10,3,10],["Laisa Barros Maciel",6,2,6],["Lorena Maranhao Paixao da Rocha",3,0,null],["Lucas Andrade Jordão",8,4,8],["Marcus Vinicius Ribeiro de Jesus",10,6,10],["Maria Eduarda Figueiredo Ambrosio",9,0,null],["Mariah Clara Belo Maniuc",1,14,null],["Otavio Alcantara dos Santos",10,0,10],["Rafael Dogini Martins",3,2,null],["Ryan Brenon dos Santos Saboia",2,0,null],["Ryan Gabriel Marques de Santa Brigida",6,0,6],["Samuel Martins de Oliveira",6,0,6],["Sara Alves de Santana",8,0,8],["Sarah Lopes da Silva",10,2,10],["Lorena de Oliveira Alves Ferreira",null,0,null]]},
+   "7ºC":{pp:null,a:[["Andressa da Silva Soares",5,0,6],["Bernardo Feitoza da Silva Pedro",6,0,6],["Bryan Oliveira dos Santos",8,0,8],["Caio Franco da Cruz",7,0,4],["Clarice de Souza Pastore",8,6,8],["Enzo Batista Viana",8,4,null],["Felipe de Brito Oliveira",5,0,null],["Gabriella da Silva Guimaraes",6,2,null],["Geovanna Caroline Dias Venancio",6,4,null],["Gustavo Araujo Alves da Silva",10,0,10],["Heloisa da Silva Chagas",6,2,6],["Isabel Karen Fonseca",6,0,6],["Isabella Cristina Rodrigues de Queiroz",10,2,10],["Jheremias Dheymison Trocatis da Silva",4,4,null],["Jhonatan Pascual Arcaya",8,4,null],["Julia Heloisa da Silva",6,0,null],["Julio Cesar Cabral de Souza",10,0,8],["Lavinia Rafaela da Silva",10,4,10],["Marcella Rhayssa Jesus Santos",6,0,null],["Maria Eduarda Fernandes de Souza",8,0,null],["Melissa Magnani Conte Vavassori",6,2,null],["Miguel Araujo Pracides",6,2,null],["Miguel de Lucena Bono",5,0,4],["Milena Ferreira Rodrigues",8,0,8],["Pablo Willy dos Santos Novaes",6,2,null],["Pedro Bento Galatti",2,4,null],["Ravi Lucas Dias",8,0,null],["Sophia Ágata Alves Moraes",6,8,null],["Sophia Montanheiro Carvalho",10,2,10],["Sophia Valério de Carvalho Vaz",10,0,10],["Sophia Venites da Silva",8,2,null],["Thiago Henrique da Silva Calado",1,12,null],["Vanderlei Portera Filho",2,10,null],["Vinicius Rodrigues Francelino",6,2,null],["Yasmim Isabelly Vieira Ferreira",10,0,10],["Kayra Kristina dos Santos",null,null,null]]},
+   "8ºA":{pp:54.9,a:[["Aaliyah Oluwafunke Marcondes Akinborewa",3,2,null],["Alejandro Bonadio Furgiuele",9,0,null],["Alicy Ribeiro de Aquino",9,0,8],["Ana Carolina Pacifico Soares",8,6,null],["Beatriz Guardachoni Ribeiro",3,0,null],["Beatriz Vitoria Ferreira da Silva",6,0,null],["Bernardo Boer de Souza",6,0,8],["Breno Martins dos Santos",10,2,10],["Bruno Thadeu Hilario Dias",10,0,10],["Eduardo Kuroishi Nomura",10,0,10],["Evelyn Gomes Pereira",10,0,10],["Francisco Anderson da Silva Soares",9,0,null],["Geovanna Souza Welte",7,2,null],["Giovanna Cordeiro Nunes",10,0,10],["Guilherme Vila Nova Macedo",10,0,10],["Heitor Pires de Araujo Souza",10,4,null],["Heloisa Silva França",5,0,null],["Isabelly Ferreira de Oliveira",4,6,null],["João Vitor Alves Furlan",1,0,null],["Livia Alves Machado",7,0,null],["Manuela Oliveira de Menezes",9,2,null],["Matheus Fernando Mesquita Cardoso",6,0,null],["Matheus Geraldes Ribeiro",5,0,4],["Miguel Ribeiro de Paula",6,2,null],["Murilo Nogueira Barros de Aguiar",9,0,8],["Pedro Henrique Cavalcante dos Santos Sousa",6,4,null],["Pedro Toledo Corrêa",3,3,null],["Ricardo Fantini Rosendo",10,0,10],["Rickelme Sousa Silva",3,0,null],["Sophia Pinheiro Silva",10,0,10],["Sophia Rafaelly dos Santos Azevedo",8,2,8],["Vinicius Franco de Assis Osaki",3,2,null],["Vitor Canto Dias",10,4,8],["Yasmim Gabrielle Souza de Ulisses",6,0,null],["Yhasmim Victoria Lopes Gabanela",6,5,6],["Leonardo de Carvalho Souza",4,0,null],["Luana Carolina Esposito de Paulo",null,null,null]]},
+   "8ºB":{pp:54.8,a:[["Adrian Leonel Benito Chura",2,6,null],["Alain Montejo Gomez",10,2,10],["Ana Julia Ferreira Gomes Santos de Melo",6,0,10],["Anny Oliveira Miranda",3,0,null],["Arthur Consani de Oliveira Jeronimo",10,4,null],["Arthur de Souza Alecrim",10,4,8],["Arthur Santos Queiroz",7,0,null],["Bruna Heloisa Neves de Souza",9,0,null],["Bryan Freitas de Alencar",10,0,10],["Carolina Pires de Almeida França",10,2,10],["Davi Pereira Santos",4,1,null],["Egberto Cavalcante de Souza Junior",10,8,10],["Fernanda Evelin da Silva",5,2,null],["Geovanna do Nascimento Silva de Araujo",10,2,null],["Helloysa Lorena Santana da Silva",5,2,null],["Henrique Colombo Marques",10,4,8],["Isabella Rodrigues da Silva",6,2,null],["Isabelle Xavier dos Santos Silva",8,0,8],["Janine Marques dos Santos Leite",10,2,null],["Julia Carvalho Verissimo",7,0,null],["Julyana Teixeira Reis",10,0,10],["Laura Rodrigues Queiroz Jardim",10,4,10],["Luam Gabriel da Silva Santos",7,0,null],["Marcus Vinicius Baptista Alves da Silva",10,0,8],["Maria Eduarda Fontes de Lima Silva",10,0,8],["Miguel Henrique de Paulo Marçal",4,0,null],["Miguel Mascarenhas Alves",1,0,null],["Murillo Daniel Santana Carvalho",4,2,null],["Rafaela Fonseca dos Santos",10,2,8],["Rafaela Vitoria de Oliveira Souza",10,1,8],["Rayssa de Souza Luiz",4,4,null],["Rodrigo Teixeira Lazaro Maia",6,2,null],["Samuel Andrade Lima",8,0,8],["Sophia Calheiros de Oliveira",6,2,null],["Victor Gabriel da Silva Barbosa",10,0,10],["Yasmin Alves do Nascimento",8,2,null],["Yuri Gonçalves Ribeiro",5,0,null],["Juliana Castro Melo de Mesquita",2,2,null],["Jennifer Godoy Firmino",null,null,null]]},
+   "9ºA":{pp:56.3,a:[["Alessandra Esther Regina dos Santos",10,4,null],["Alex Alves de Oliveira",10,2,10],["Alexandre Victor Carvalho Farias",10,4,10],["Ana Clara Vieira Delgardo",4,2,null],["Arthur Leandro Alvim Novaes",4,4,null],["Beatriz Americo de Almeida",9,2,null],["Bernardo Morais de Carvalho",10,0,10],["Daniela Ribeiro Silva",8,0,8],["Danillo dos Santos Gonçalves da Silva",4,2,null],["Emanuelly Rodrigues de Oliveira",5,2,null],["Enzo Calheiros de Oliveira",8,4,null],["Enzo de Macedo Rodrigues",10,0,10],["Giovanna Facio Rodrigues de Souza",10,0,10],["Gustavo Ferreira Diaz",10,8,10],["Gustavo Inacio Setra",10,0,null],["Joao Pedro da Silva Santana",4,0,null],["João Victor Fernandes de Souza",10,0,8],["João Vitor Cunha Oliveira",1,2,null],["Julia Back Moniz",10,6,10],["Lucas da Silva Santos",6,5,null],["Manuella Oliveira Silva de Sa",5,0,null],["Maria Eduarda de Azevedo Tozati",7,0,null],["Maria Victória Baltazar Hilario",7,5,null],["Miguel Carvalho Cutolo",10,0,8],["Miguel Lourenço Costa",4,4,null],["Nickollas Anthony dos Santos Mariano",5,16,null],["Nicolas Enzo Ferreira Monteiro",5,2,10],["Nicolas Rafael de Figueiredo Boer",1,6,null],["Pedro Henrique da Cruz de Jesus",6,4,null],["Rafaela Xavier Lima",10,8,8],["Raquel Rebeca Marques dos Santos Leite",7,4,8],["Victor Augusto de Lucena Santos",10,0,10],["Ysadora Akemi Souza Lima Kuwae",7,8,10],["Ariel Umburana dos Santos",2,4,null],["Gabriel Izidro",null,2,10]]},
+   "9ºB":{pp:54.3,a:[["Agatha Giovanna Sena Nunes",3,6,null],["Anne Gabrielle da Silva",10,2,8],["Beatriz Bandeira Pereira",10,2,10],["Davi Kenji Ueda",8,2,8],["Deborah Magalhaes Negreiros",10,2,8],["Ezequiel da Silva Rodrigues",7,0,null],["Fernando da Silva Martins dos Reis",10,2,null],["Giovanna Abdala da Silva",7,8,null],["Guilherme Ibelli Gonçalves",7,10,null],["Henzo Gabriel Alves Peixoto",9,2,null],["Isabella Moraes Tucci",10,2,10],["Izadora Cardoso da Silva",8,6,8],["Joao Vitor Soares Lima",8,6,10],["Kauã dos Santos Maraschiello Dantas",6,0,null],["Kauan Miranda de Assunçao",8,3,null],["Kristian Pereira dos Santos",10,2,10],["Laura Alves Cuceneli",5,2,null],["Levi Motta Sudré",10,4,10],["Lucas Levy Dias Spuri",10,4,null],["Marcos Vinicius Brandao Conceiçao",5,7,10],["Maria Clara de Paula Santos",5,6,10],["Theodore Castro Melo de Mesquita",6,4,10],["Murilo Luis Beloni",6,2,null],["Nicoly Sayury Kagueyama Batista",5,0,null],["Rafael Moreira Custodio",5,2,null],["Rebeca Torres Lopes de Souza Silva",10,0,null],["Rebecca Violim Gouveia Saraiva",10,6,null],["Steffany Oliveira Gonzalez",5,2,8],["Thalyson Ferreira da Silva",5,0,null],["Ticiane Rodrigues Amorim",10,0,8],["Victor Hugo Oliveira de Menezes",10,0,10],["Vitoria Damasceno Sanches",1,0,null],["Vitoria Miria Caetano Costa Pires",10,2,null],["Yan Felipe de Brito Lima",4,12,null],["Ana Beatriz Lisboa de Sousa",5,0,null],["Willian Lima Cabral dos Santos",null,null,null]]}
+  };
+
+  function planoModelo(turma){
+    const s = serieDe(turma);
+    return "PLANO DE AÇÃO — "+turma+" (Meta Ouro "+METAS[s].ouro.toFixed(1)+")\n\n"+
+      "• Diagnóstico: descritores do Currículo Paulista/BNCC ainda frágeis.\n"+
+      "• Foco nos alunos em situação crítica (vermelhos): atendimento em grupo reduzido.\n"+
+      "• Peer Instruction: duplas produtivas (quem domina apoia quem recompõe).\n"+
+      "• Bloom: começar em LEMBRAR/COMPREENDER antes de APLICAR.\n"+
+      "• Registro semanal do avanço rumo à Meta Ouro/Diamante.\n\n(Texto editável — liberdade de cátedra.)";
+  }
+
+  function gerarInicial(){
+    const turmas = Object.keys(BASE).map(nome=>{
+      const t = BASE[nome];
+      return { nome, serie:serieDe(nome), provaPaulista:t.pp,
+        alunos: t.a.map((r,i)=>({
+          id: nome.replace(/\s+/g,"-").toLowerCase()+"-"+i+"-"+Math.random().toString(36).slice(2,6),
+          nome:r[0], nota1:(r[1]===null?"":r[1]), faltas1:(r[2]===null?"":r[2]),
+          nota2:(r[3]===null?"":r[3]), faltas2:"", justificativa:""
+        })) };
+    });
+    const planos = {}; Object.keys(BASE).forEach(n=> planos[n]=planoModelo(n));
+    return { versao:SEED_VERSAO, turmas, planos };
+  }
+
+  function mediaNotas(a){
+    const v=[a.nota1,a.nota2].map(x=> (x===""||x===null||x===undefined)?null:Number(x)).filter(x=>x!==null);
+    if(!v.length) return null; return v.reduce((s,x)=>s+x,0)/v.length;
+  }
+  function corAluno(a, serie){
+    const m=mediaNotas(a), M=METAS[serie];
+    if(m===null) return {k:"cinza",row:"",dot:"⚪",sel:false};
+    if(m>=M.diamante) return {k:"diamante",row:"bg-emerald-50",dot:"🟢",sel:true};
+    if(m>=M.ouro) return {k:"verde",row:"bg-emerald-50",dot:"🟢",sel:false};
+    if(m>=M.ouro*0.6) return {k:"amarelo",row:"bg-amber-50",dot:"🟡",sel:false};
+    return {k:"vermelho",row:"bg-rose-50",dot:"🔴",sel:false};
+  }
+  function mediaTurmaBim(t,campo){
+    const v=t.alunos.map(a=>a[campo]).map(x=>(x===""||x==null)?null:Number(x)).filter(x=>x!==null);
+    if(!v.length) return null; return v.reduce((s,x)=>s+x,0)/v.length;
+  }
+  function nivelCard(t){
+    const m=METAS[t.serie].ouro*10, pp=t.provaPaulista;
+    if(pp===null||pp===undefined) return {k:"cinza",barra:"bg-slate-300",txt:"text-slate-400",borda:"border-slate-200",chip:"bg-slate-100 text-slate-600",rotulo:"Sem Prova Paulista"};
+    if(pp>=m) return {k:"verde",barra:"bg-emerald-500",txt:"text-emerald-600",borda:"border-emerald-300",chip:"bg-emerald-100 text-emerald-700",rotulo:"No ritmo da meta"};
+    if(pp>=m*0.7) return {k:"amarelo",barra:"bg-amber-500",txt:"text-amber-600",borda:"border-amber-200",chip:"bg-amber-100 text-amber-700",rotulo:"Em recomposição"};
+    return {k:"vermelho",barra:"bg-rose-500",txt:"text-rose-600",borda:"border-rose-300",chip:"bg-rose-100 text-rose-700",rotulo:"Intervenção crítica"};
+  }
+
+  function Login({ aoEntrar }){
+    const [modo,setModo]=useState("entrar"), [email,setEmail]=useState(""), [senha,setSenha]=useState("");
+    const [erro,setErro]=useState(""), [msg,setMsg]=useState(""), [load,setLoad]=useState(false);
+    async function enviar(){
+      setErro("");setMsg("");
+      if(!email||!senha){setErro("Preencha e-mail e senha.");return;}
+      if(senha.length<6){setErro("A senha precisa ter ao menos 6 caracteres.");return;}
+      setLoad(true);
+      try{
+        if(modo==="criar"){
+          const {data,error}=await supabase.auth.signUp({email,password:senha});
+          if(error) throw error;
+          if(data.session) aoEntrar(data.session.user); else {setMsg("Conta criada! Já pode entrar.");setModo("entrar");}
+        }else{
+          const {data,error}=await supabase.auth.signInWithPassword({email,password:senha});
+          if(error) throw error; aoEntrar(data.session.user);
+        }
+      }catch(e2){
+        const m=(e2&&e2.message)||"";
+        if(m.includes("Invalid login")) setErro("E-mail ou senha incorretos.");
+        else if(m.includes("already registered")){setErro("Esse e-mail já tem conta. Tente entrar.");setModo("entrar");}
+        else setErro(m||"Não foi possível continuar.");
+      }finally{ setLoad(false); }
+    }
+    return e("div",{className:"min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900"},
+      e("div",{className:"w-full max-w-md fade-in"},
+        e("div",{className:"text-center mb-6"},
+          e("div",{className:"inline-flex w-14 h-14 rounded-2xl bg-indigo-500 text-white text-2xl font-extrabold items-center justify-center shadow-lg"},"EN"),
+          e("h1",{className:"mt-4 text-2xl font-extrabold text-white"},"Painel de Recomposição"),
+          e("p",{className:"text-indigo-200 text-sm"},"Língua Inglesa · Fundamental II")),
+        e("div",{className:"bg-white rounded-2xl shadow-xl p-6"},
+          e("div",{className:"flex gap-2 mb-5 bg-slate-100 p-1 rounded-xl"},
+            e("button",{onClick:()=>{setModo("entrar");setErro("");},className:"flex-1 py-2 rounded-lg text-sm font-semibold "+(modo==="entrar"?"bg-white shadow text-indigo-600":"text-slate-500")},"Entrar"),
+            e("button",{onClick:()=>{setModo("criar");setErro("");},className:"flex-1 py-2 rounded-lg text-sm font-semibold "+(modo==="criar"?"bg-white shadow text-indigo-600":"text-slate-500")},"Criar conta")),
+          e("label",{className:"block text-xs font-semibold text-slate-500 mb-1"},"E-MAIL"),
+          e("input",{type:"email",value:email,onChange:ev=>setEmail(ev.target.value),onKeyDown:ev=>ev.key==="Enter"&&enviar(),className:"w-full mb-4 px-3 py-2.5 rounded-xl border border-slate-300 text-sm"}),
+          e("label",{className:"block text-xs font-semibold text-slate-500 mb-1"},"SENHA"),
+          e("input",{type:"password",value:senha,onChange:ev=>setSenha(ev.target.value),onKeyDown:ev=>ev.key==="Enter"&&enviar(),className:"w-full mb-4 px-3 py-2.5 rounded-xl border border-slate-300 text-sm"}),
+          erro&&e("div",{className:"mb-3 text-sm text-rose-600 bg-rose-50 rounded-lg px-3 py-2"},erro),
+          msg&&e("div",{className:"mb-3 text-sm text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2"},msg),
+          e("button",{onClick:enviar,disabled:load,className:"w-full py-2.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm disabled:opacity-60"},load?"Aguarde…":(modo==="criar"?"Criar minha conta":"Entrar no painel")),
+          e("p",{className:"mt-4 text-xs text-center text-slate-400"},"Cada professor enxerga apenas o próprio painel."))));
+  }
+
+  function Dashboard({ dados, abrir }){
+    const totalAlunos=dados.turmas.reduce((s,t)=>s+t.alunos.length,0);
+    const criticas=dados.turmas.filter(t=>{const m=METAS[t.serie].ouro*10;return t.provaPaulista!=null && t.provaPaulista<m*0.7;}).length;
+    const prontos=dados.turmas.reduce((s,t)=>s+t.alunos.filter(a=>corAluno(a,t.serie).sel).length,0);
+    return e("div",{className:"fade-in"},
+      e("div",{className:"grid sm:grid-cols-4 gap-4 mb-6"},
+        kpi("Turmas",dados.turmas.length,"text-slate-800"),
+        kpi("Intervenção crítica",criticas,"text-rose-600"),
+        kpi("Total de alunos",totalAlunos,"text-slate-800"),
+        kpi("Prontos para o Mundo",prontos,"text-emerald-600")),
+      e("div",{className:"grid sm:grid-cols-2 lg:grid-cols-3 gap-4"},
+        dados.turmas.map(t=>{
+          const nv=nivelCard(t), metaPct=METAS[t.serie].ouro*10, pp=t.provaPaulista, temPP=pp!=null;
+          const faltam=temPP?Math.max(0,metaPct-pp):null;
+          const m1=mediaTurmaBim(t,"nota1"), m2=mediaTurmaBim(t,"nota2");
+          let tend="→",tcor="text-slate-400";
+          if(m1!=null&&m2!=null){ if(m2>m1+0.05){tend="↑";tcor="text-emerald-600";} else if(m2<m1-0.05){tend="↓";tcor="text-rose-600";} }
+          return e("button",{key:t.nome,onClick:()=>abrir(t.nome),
+            className:"text-left bg-white rounded-2xl p-5 shadow-sm border-2 transition hover:shadow-md "+nv.borda},
+            e("div",{className:"flex items-center justify-between mb-2"},
+              e("span",{className:"text-xl font-extrabold text-slate-800"},t.nome),
+              e("span",{className:"text-[10px] font-bold px-2 py-1 rounded-full "+nv.chip},nv.rotulo)),
+            e("div",{className:"flex items-end justify-between mb-1"},
+              e("span",{className:"text-4xl font-extrabold "+nv.txt}, temPP?pp+"%":"—"),
+              e("span",{className:"text-xs text-slate-400 mb-1"},"Meta Ouro "+METAS[t.serie].ouro.toFixed(1)+" ("+metaPct+"%)")),
+            e("div",{className:"w-full h-2.5 bg-slate-100 rounded-full overflow-hidden"},
+              e("div",{className:"h-full rounded-full "+nv.barra,style:{width:(temPP?Math.min(100,pp):0)+"%"}})),
+            e("div",{className:"mt-3 text-xs text-slate-500 flex items-center justify-between"},
+              e("span",null,t.alunos.length+" aluno(s)"),
+              e("span",{className:tcor+" font-semibold"},"Tendência "+tend)),
+            e("div",{className:"mt-1 text-xs "+nv.txt+" font-semibold"},
+              !temPP?"aguardando prova":(faltam<=0?"no ritmo da meta 🎯":"faltam "+faltam.toFixed(0)+" pts para a meta")));
+        })));
+  }
+  function kpi(label,val,cor){ return e("div",{className:"bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"},
+    e("div",{className:"text-xs text-slate-500 uppercase font-semibold"},label),
+    e("div",{className:"text-3xl font-extrabold "+cor},val)); }
+
+  function Detalhe({ turma, voltar, salvarTurma, plano, salvarPlano }){
+    const [alunos,setAlunos]=useState(turma.alunos);
+    const [txtPlano,setTxtPlano]=useState(plano||"");
+    const [salvando,setSalvando]=useState(false), [status,setStatus]=useState("");
+    const serie=turma.serie, M=METAS[serie];
+    function editar(id,campo,val){ setAlunos(p=>p.map(a=>a.id===id?{...a,[campo]:val}:a)); }
+    function add(){ setAlunos(p=>[...p,{id:"novo-"+Math.random().toString(36).slice(2,7),nome:"Novo aluno",nota1:"",faltas1:"",nota2:"",faltas2:"",justificativa:""}]); }
+    function remover(id){ setAlunos(p=>p.filter(a=>a.id!==id)); }
+    async function salvar(){
+      setSalvando(true);setStatus("");
+      const ok=await salvarTurma({...turma,alunos});
+      const ok2=await salvarPlano(turma.nome,txtPlano);
+      setSalvando(false);setStatus(ok&&ok2?"ok":"erro");setTimeout(()=>setStatus(""),3000);
+    }
+    const ordem={vermelho:0,amarelo:1,cinza:2,verde:3,diamante:4};
+    const ordenados=[...alunos].sort((a,b)=>ordem[corAluno(a,serie).k]-ordem[corAluno(b,serie).k]);
+    const criticos=alunos.filter(a=>corAluno(a,serie).k==="vermelho");
+    const prontos=alunos.filter(a=>corAluno(a,serie).sel);
+
+    return e("div",{className:"fade-in"},
+      e("button",{onClick:voltar,className:"text-sm text-indigo-600 font-semibold mb-4"},"← Voltar para a visão geral"),
+      e("div",{className:"flex flex-wrap items-center justify-between gap-3 mb-4"},
+        e("div",null,
+          e("h2",{className:"text-2xl font-extrabold text-slate-800"},"Turma "+turma.nome),
+          e("p",{className:"text-sm text-slate-500"},alunos.length+" aluno(s) · Meta Ouro "+M.ouro.toFixed(1)+" · Diamante "+M.diamante.toFixed(1)+
+            (turma.provaPaulista!=null?" · Prova Paulista "+turma.provaPaulista+"% de acertos":""))),
+        e("div",{className:"flex gap-2"},
+          e("div",{className:"px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-center"},
+            e("div",{className:"text-xs text-rose-500"},"Em estado crítico"),
+            e("div",{className:"text-xl font-extrabold text-rose-600"},criticos.length)),
+          e("div",{className:"px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-center"},
+            e("div",{className:"text-xs text-emerald-600"},"Prontos para o Mundo"),
+            e("div",{className:"text-xl font-extrabold text-emerald-600"},prontos.length)))),
+
+      criticos.length>0 && e("div",{className:"mb-4 bg-rose-50 border border-rose-200 rounded-2xl p-4"},
+        e("p",{className:"font-bold text-rose-700 mb-1"},"🔴 Foco imediato — alunos em estado crítico"),
+        e("p",{className:"text-sm text-rose-600"},criticos.map(a=>a.nome).join(" · "))),
+
+      e("div",{className:"overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm"},
+        e("table",{className:"w-full text-sm"},
+          e("thead",null,e("tr",{className:"bg-slate-50 text-slate-500 text-xs uppercase"},
+            e("th",{className:"text-left p-3"},"Aluno"),
+            e("th",{className:"p-3"},"1º bim"),e("th",{className:"p-3"},"Faltas 1º"),
+            e("th",{className:"p-3"},"2º bim"),e("th",{className:"p-3"},"Faltas 2º"),
+            e("th",{className:"text-left p-3"},"Justificativa pedagógica"),
+            e("th",{className:"p-3"},"Sit."),e("th",{className:"p-3"}))),
+          e("tbody",null, ordenados.map(a=>{
+            const c=corAluno(a,serie);
+            return e("tr",{key:a.id,className:"border-t border-slate-100 align-top "+c.row},
+              e("td",{className:"p-3",style:{minWidth:"180px"}},
+                e("input",{value:a.nome,onChange:ev=>editar(a.id,"nome",ev.target.value),className:"w-full font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-200"}),
+                c.k==="vermelho"&&e("span",{className:"inline-block mt-1 text-[10px] font-bold text-white bg-rose-500 px-2 py-0.5 rounded-full"},"Estado Crítico"),
+                c.sel&&e("span",{className:"inline-block mt-1 text-[10px] font-bold text-white bg-emerald-500 px-2 py-0.5 rounded-full"},"⭐ Pronto para o Mundo")),
+              celNum(a,"nota1",editar),celNum(a,"faltas1",editar),
+              celNum(a,"nota2",editar),celNum(a,"faltas2",editar),
+              e("td",{className:"p-3",style:{minWidth:"200px"}},
+                e("textarea",{value:a.justificativa||"",onChange:ev=>editar(a.id,"justificativa",ev.target.value),rows:"2",placeholder:"Contexto do aluno…",className:"w-full px-2 py-1 rounded-lg border border-slate-200 text-xs resize-y"})),
+              e("td",{className:"p-3 text-center text-lg"},c.dot),
+              e("td",{className:"p-3 text-center"},e("button",{onClick:()=>remover(a.id),className:"text-slate-300 hover:text-rose-500 text-lg"},"×")));
+          })))),
+
+      e("div",{className:"flex flex-wrap items-center gap-3 mt-4"},
+        e("button",{onClick:add,className:"px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold"},"+ Adicionar aluno"),
+        e("button",{onClick:salvar,disabled:salvando,className:"px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold disabled:opacity-60"},salvando?"Salvando…":"Salvar alterações"),
+        status==="ok"&&e("span",{className:"text-sm text-emerald-600 font-semibold"},"✓ Salvo na nuvem"),
+        status==="erro"&&e("span",{className:"text-sm text-rose-600 font-semibold"},"Não consegui salvar. Verifique a internet.")),
+
+      e("div",{className:"mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-4"},
+        e("div",{className:"flex items-center gap-2 mb-2"},
+          e("span",{className:"w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center text-sm"},"PA"),
+          e("span",{className:"font-semibold text-slate-700"},"Plano de Ação — "+turma.nome),
+          e("span",{className:"ml-auto text-xs text-slate-400"},"editável · liberdade de cátedra")),
+        e("textarea",{value:txtPlano,onChange:ev=>setTxtPlano(ev.target.value),rows:"10",className:"w-full px-3 py-2 rounded-xl border border-slate-200 text-sm resize-y leading-relaxed"}),
+        e("p",{className:"text-xs text-slate-400 mt-2"},"O plano é salvo junto com o botão “Salvar alterações” acima.")));
+  }
+  function celNum(a,campo,editar){
+    return e("td",{className:"p-2 text-center"},
+      e("input",{type:"number",step:"1",value:(a[campo]===null||a[campo]===undefined)?"":a[campo],
+        onChange:ev=>editar(a.id,campo,ev.target.value),
+        className:"w-16 text-center px-2 py-1 rounded-lg border border-slate-200"}));
+  }
+
+  function App(){
+    const [usuario,setUsuario]=useState(null);
+    const [load,setLoad]=useState(true);
+    const [dados,setDados]=useState(null);
+    const [turmaAberta,setTurmaAberta]=useState(null);
+    const importRef=useRef(null);
+
+    useEffect(()=>{
+      if(!supabase){ setLoad(false); return; }
+      supabase.auth.getSession().then(({data})=>{ if(data.session) setUsuario(data.session.user); setLoad(false); });
+      const {data:sub}=supabase.auth.onAuthStateChange((_e,s)=>setUsuario(s?s.user:null));
+      return ()=>sub.subscription.unsubscribe();
+    },[]);
+
+    useEffect(()=>{
+      if(!usuario||!supabase){ setDados(null); return; }
+      (async()=>{
+        const {data}=await supabase.from("painel_dados").select("conteudo").eq("dono",usuario.id).maybeSingle();
+        if(data&&data.conteudo&&data.conteudo.versao===SEED_VERSAO){ setDados(data.conteudo); }
+        else { const ini=gerarInicial(); setDados(ini);
+          await supabase.from("painel_dados").upsert({id:usuario.id,dono:usuario.id,conteudo:ini,atualizado_em:new Date().toISOString()}); }
+      })();
+    },[usuario]);
+
+    async function persistir(nd){ setDados(nd);
+      const {error}=await supabase.from("painel_dados").upsert({id:usuario.id,dono:usuario.id,conteudo:nd,atualizado_em:new Date().toISOString()});
+      return !error; }
+    async function salvarTurma(nt){ return persistir({...dados,turmas:dados.turmas.map(t=>t.nome===nt.nome?nt:t)}); }
+    async function salvarPlano(turma,txt){ const p={...(dados.planos||{})}; p[turma]=txt; return persistir({...dados,planos:p}); }
+
+    function exportar(){ const b=new Blob([JSON.stringify(dados,null,2)],{type:"application/json"});
+      const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download="painel-ingles-backup.json"; a.click(); URL.revokeObjectURL(u); }
+    function importar(ev){ const f=ev.target.files[0]; if(!f) return; const r=new FileReader();
+      r.onload=async()=>{ try{ const o=JSON.parse(r.result); if(!o.turmas) throw 0; await persistir(o); alert("Backup importado!"); }catch(e2){ alert("Arquivo inválido."); } };
+      r.readAsText(f); ev.target.value=""; }
+    async function sair(){ await supabase.auth.signOut(); setUsuario(null); setDados(null); setTurmaAberta(null); }
+
+    if(!supabase) return e("div",{className:"min-h-screen flex items-center justify-center p-6 text-center"},
+      e("div",{className:"max-w-md bg-rose-50 border border-rose-200 rounded-2xl p-6"},
+        e("p",{className:"text-rose-700 font-semibold"},"Não foi possível carregar a nuvem. Verifique a internet e recarregue.")));
+    if(load) return e("div",{className:"min-h-screen flex items-center justify-center text-slate-400"},"Carregando…");
+    if(!usuario) return e(Login,{aoEntrar:u=>setUsuario(u)});
+    if(!dados) return e("div",{className:"min-h-screen flex items-center justify-center text-slate-400"},"Carregando seu painel…");
+
+    const turmaObj=turmaAberta?dados.turmas.find(t=>t.nome===turmaAberta):null;
+    return e("div",{className:"min-h-screen"},
+      e("header",{className:"bg-white border-b border-slate-200 sticky top-0 z-10"},
+        e("div",{className:"max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3"},
+          e("div",{className:"flex items-center gap-2"},
+            e("div",{className:"w-9 h-9 rounded-xl bg-indigo-500 text-white font-extrabold flex items-center justify-center text-sm"},"EN"),
+            e("div",null,
+              e("div",{className:"font-extrabold text-slate-800 leading-tight"},"Painel de Recomposição"),
+              e("div",{className:"text-xs text-slate-400 leading-tight"},"Língua Inglesa · Fundamental II"))),
+          e("div",{className:"ml-auto flex items-center gap-2"},
+            e("button",{onClick:exportar,className:"px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"},"Exportar"),
+            e("button",{onClick:()=>importRef.current.click(),className:"px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200"},"Importar"),
+            e("input",{type:"file",accept:"application/json",ref:importRef,onChange:importar,className:"hidden"}),
+            e("span",{className:"hidden sm:inline text-xs text-slate-400 max-w-[160px] truncate"},usuario.email),
+            e("button",{onClick:sair,className:"px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100"},"Sair")))),
+      e("main",{className:"max-w-6xl mx-auto px-4 py-6"},
+        turmaObj
+          ? e(Detalhe,{turma:turmaObj,voltar:()=>setTurmaAberta(null),salvarTurma,plano:(dados.planos||{})[turmaObj.nome],salvarPlano})
+          : e(React.Fragment,null,
+              e("div",{className:"flex items-center justify-between mb-4"},
+                e("h1",{className:"text-xl font-extrabold text-slate-800"},"Visão geral das turmas"),
+                e("span",{className:"text-xs text-emerald-600"},"● Conectado à nuvem")),
+              e(Dashboard,{dados,abrir:setTurmaAberta}))),
+      e("footer",{className:"max-w-6xl mx-auto px-4 py-6 text-center text-xs text-slate-400"},
+        "Documento vivo · dados protegidos por RLS · faça backup com “Exportar”."));
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(e(App));
+})();
+</script>
+</body>
+</html>
