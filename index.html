@@ -28,7 +28,7 @@
   let supabase = null;
   try { if (window.supabase && window.supabase.createClient) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e){}
 
-  const SEED_VERSAO = 4;
+  const SEED_VERSAO = 5;
   const METAS = { "6":{ouro:5.0,diamante:5.4}, "7":{ouro:7.0,diamante:7.3}, "8":{ouro:6.3,diamante:6.7}, "9":{ouro:7.2,diamante:7.5} };
   const serieDe = (t)=> t.charAt(0);
 
